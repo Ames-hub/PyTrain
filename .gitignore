@@ -1,0 +1,4 @@
+venv
+library/ssl
+settings.json
+__pycache__
