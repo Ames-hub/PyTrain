@@ -11,7 +11,7 @@ class data_tables:
         "AnonAllowed": False,
         "RootPassword": gen_random_password(),
         "port": 6464,
-        "certfile": "library/ssl/server.cert",
+        "certfile": "library/ssl/certificate.pem",
         "keyfile": "library/ssl/private.key",
         "PyTrain_users": {}
     }
