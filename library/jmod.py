@@ -26,7 +26,7 @@ class data_tables:
             "username": "default_user" if username is None else username,
             "password": "password123" if password is None else password,
             "permissions": "elradfmw" if permissions == None else permissions,
-            "home_dir": home_dir,
+            "home_dir": home_dir if home_dir != "<>local_user<>" else f"ftp_dir/{username}",
         }
 
 class jmod:    

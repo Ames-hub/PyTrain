@@ -13,6 +13,7 @@ import os
 import multiprocessing
 os.makedirs("library/ssl/", exist_ok=True)
 from library.server import ftps
+from library.userman import userman
 
 def get_thread(name):
     for thread in multiprocessing.active_children():
@@ -75,6 +76,8 @@ class PyTrain:
                             print(f"{colours['green']}The FTP server has been stopped.{colours['end']}")
                     except AttributeError:
                         print(f"{colours['yellow']}The FTP server is not running.{colours['end']}")
+                elif command in ["userman", "usermanager", "user manager", 'user', 'u']:
+                    userman.CLI()
                 elif command == "":
                     continue # Captures empty input
                 else:
@@ -89,6 +92,10 @@ class PyTrain:
         print("exit - Exits the program")
         print("cls - Clears the console")
         print("help - Displays this message")
+        print("status - Checks the status of the FTP server")
+        print("start - Starts the FTP server")
+        print("stop - Stops the FTP server")
+        print("userman - Opens the user manager")
 
 if __name__ == "__main__":
     PyTrain.main()

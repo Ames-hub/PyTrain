@@ -106,12 +106,19 @@ class ftps:
         for user in user_list:
             user: dict = user_list[user]
 
+            try:
+                os.makedirs(user['home_dir'], exist_ok=True)
+            except PermissionError:
+                print(f"PermissionError: Could not create directory {user['home_dir']}.")
+                continue
+
             # Adds the user to the authorizer
             authorizer.add_user(
-                user['username'],
-                user['password'],
+                username=user['username'],
+                password=user['password'],
                 homedir=user['home_dir'],
-                perm=user['perm']
+                perm=user['permissions'],
+                msg_login="Welcome to PyTrain FTP server!"
             )
 
         ftpAnonAllowed = jmod.getvalue(
@@ -196,7 +203,8 @@ class ftps:
                             user['username'],
                             user['password'],
                             homedir=user['home_dir'],
-                            perm=user['perm']
+                            perm=user['permissions'],
+                            msg_login="Welcome to PyTrain FTP server!"
                         )
                     # If they are not in the json file but are in the authorizer, remove them
                     if user['username'] in authorizer.user_table and user['username'] not in user_list:
