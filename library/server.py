@@ -60,7 +60,8 @@ class ftps:
     def run():
         # Starts the FTP server in a thread
         THREAD = multiprocessing.Process(
-            target=ftps.main
+            target=ftps.main,
+            name="FTPServer"
         )
         THREAD.start()
         try:

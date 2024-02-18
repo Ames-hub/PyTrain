@@ -10,8 +10,14 @@ sentry.init(
     profiles_sample_rate=1.0,
 )
 import os
+import multiprocessing
 os.makedirs("library/ssl/", exist_ok=True)
 from library.server import ftps
+
+def get_thread(name):
+    for thread in multiprocessing.active_children():
+        if thread.name == name:
+            return thread
 
 colours = {
     "red": "\033[91m",
@@ -48,11 +54,31 @@ class PyTrain:
                     continue
                 elif command == "help":
                     PyTrain.print_help_msg()
+                elif command == "status":
+                    is_alive = get_thread("FTPServer").is_alive()
+                    if is_alive:
+                        alive_msg = f"{colours['green']}The FTP server is running.{colours['end']}"
+                    else:
+                        alive_msg = f"{colours['red']}The FTP server is not running.{colours['end']}"                    
+                    print(alive_msg)
+                elif command == "start" or command == "run":
+                    try:
+                        if get_thread("FTPServer").pid != None:
+                            print(f"{colours['yellow']}The FTP server is already running.{colours['end']}")
+                    except AttributeError:
+                        FTPS_THREAD = ftps.run()
+                        print(f"{colours['green']}The FTP server has been started.{colours['end']}")
+                elif command == "stop" or command == "kill":
+                    try:
+                        if get_thread("FTPServer").pid != None:
+                            FTPS_THREAD.kill()
+                            print(f"{colours['green']}The FTP server has been stopped.{colours['end']}")
+                    except AttributeError:
+                        print(f"{colours['yellow']}The FTP server is not running.{colours['end']}")
                 elif command == "":
                     continue # Captures empty input
                 else:
                     print(f"{colours['yellow']}Invalid command. Please try again.{colours['end']}")
-                print("\n")
             except KeyboardInterrupt:
                 print("Exiting. Thank you for using PyTrain!")
                 FTPS_THREAD.kill()
