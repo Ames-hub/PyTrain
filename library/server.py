@@ -210,6 +210,19 @@ class ftps:
                     if user['username'] in authorizer.user_table and user['username'] not in user_list:
                         authorizer.remove_user(user['username'])
 
+                    # Checks if the user's permissions are different
+                    if user['username'] in authorizer.user_table and user['username'] in user_list:
+                        if authorizer.user_table[user['username']]['perm'] != user['permissions']:
+                            authorizer.user_table[user['username']]['perm'] = user['permissions']
+
+                        if os.path.isabs(user['home_dir']):
+                            homedir = user['home_dir']
+                        else:
+                            homedir = os.path.join(os.getcwd(), user['home_dir'])
+                        # Checks if the user's home directory is different
+                        if authorizer.user_table[user['username']]['home'] != homedir:
+                            authorizer.user_table[user['username']]['home'] = homedir
+
         except KeyboardInterrupt:
             server.close_all()
             print("--FILE TRANSFER PROTOCAL HAS BEEN STOPPED--")

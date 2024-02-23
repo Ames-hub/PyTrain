@@ -44,6 +44,8 @@ class userman:
                 userman.list_users(for_cli=True)
             elif command == "5" or command == "help":
                 userman.print_help_msg()
+            elif command == "":
+                continue
             else:
                 print("Invalid command. Please try again.")
                 continue
@@ -157,7 +159,7 @@ class userman:
                     user['home_dir'] = userman.get_data.homedir()
                 elif field == "perm":
                     print("Enter the new permissions.")
-                    user['perm'] = userman.get_data.perms()
+                    user['permissions'] = userman.get_data.perms()
                 elif field == "username":
                     del user_list[username]
                     print("Enter the new username.")
@@ -338,6 +340,7 @@ class userman:
             while True:
                 # If the user chose "preset" permissions, present them with three options
                 if perm_type == "preset":
+                    askToSave = False
                     print("Preset permissions:")
                     print(f"1. Read only ({read_perms})")
                     print(f"2. Read Write ({read_write_perms})")
@@ -371,16 +374,25 @@ class userman:
                         dt=data_tables.SETTINGS_DT,
                         default={}
                     )
+                    compare_sets = {}
+                    for perm_set in saved_sets:
+                        compare_sets[f'<{perm_set}>'] = saved_sets[perm_set]["permissions"]
+                        
                     # If there are no saved permission sets, inform the user
                     if len(saved_sets) == 0:
                         print(f"{colours['yellow']}No saved permission sets found.{colours['white']}")
                     else:
-                        print("Saved permission sets:")
+                        print(f"{colours['green']}Saved permission sets:{colours['white']}")
+                        
                         # Print the saved permission sets
+                        counter = 0
                         for perm_set in saved_sets:
                             # permset would be the key in this case. saved_sets[perm_set] would be the value
-                            name, desc, permission = saved_sets[perm_set]
-                            print(f"<{name}> : {desc} ({permission})")
+                            name, desc, permission = saved_sets[perm_set]['name'], saved_sets[perm_set]['description'], saved_sets[perm_set]['permissions']
+                            # If the counter is even, set the text colour to white. If it's odd, set the text colour to gray
+                            grayed = "" if counter % 2 == 0 else "\033[90m"
+                            print(f"{grayed}<{name}> : {desc} ({permission}){colours['white']}")
+                            counter += 1
                         print()
 
                     # Ask the user to enter the permissions they want to use
@@ -391,6 +403,15 @@ class userman:
                     # If the user types "cancel", raise a KeyboardInterrupt
                     if perm == "cancel":
                         raise KeyboardInterrupt
+                    elif perm.startswith("<") and perm.endswith(">"):
+                        if perm in compare_sets.keys():
+                            print(f"Selected permission set {perm}")
+                            perm = compare_sets[perm]
+                            askToSave = False
+                            break
+                        else:
+                            print("Invalid permission set name. Please try again.")
+                            continue
                     # If the user types a string that doesn't match the regular expression "^[elradfmw]{1,7}$", inform them that their choice is invalid and ask again
                     elif not re.match("^[elradfmw]{1,7}$", perm):
                         print("Invalid permissions. Please try again.")
