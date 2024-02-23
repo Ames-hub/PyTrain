@@ -51,6 +51,10 @@ class PyTrain:
                     else:
                         print("Continuing to run.")
                 elif command == "cls":
+                    print("If you're seeing this message, it means that the clear command is not supported on your terminal.")
+                    print("This cannot be fixed by us as it is a problem with terminals such as PufferPanel terminal.")
+                    print("To give the illusion of a clear command, we will now print 100 new lines.")
+                    print("\n" * 100)
                     os.system("cls" if os.name == "nt" else "clear")
                     continue
                 elif command == "help":
