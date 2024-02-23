@@ -13,8 +13,16 @@ class data_tables:
         "port": 6464,
         "certfile": "library/ssl/certificate.pem",
         "keyfile": "library/ssl/private.key",
+        "permission_sets": {},
         "PyTrain_users": {}
     }
+
+    PERMISSION_SET = {
+        'name': 'default',
+        'description': 'Default permission set. Allows all permissions.',
+        'permissions': 'elradfmw'
+    }
+
     def NEW_USER_DT(username=None, password=None, permissions=None, home_dir=None):
         if home_dir == None:
             if username != None:

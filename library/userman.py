@@ -298,49 +298,185 @@ class userman:
                 else:
                     return homedir
                 
-        def perms():
+        def perms(askToSave=True):
+            # Start an infinite loop
             while True:
+                # Define permission sets
                 read_perms = "elr"
                 read_write_perms = "elradfmw"
                 admin_perms = "elradfmwMT"
 
+                # Print the link to the documentation and ask the user to choose between preset and custom permissions
                 print("https://pyftpdlib.readthedocs.io/en/latest/api.html#control-connection")
                 print("Do you want to use a preset or custom permissions? (preset/custom)")
                 perm_type = input(">>> ").lower()
+                # If the user types "cancel", raise a KeyboardInterrupt
                 if perm_type == "cancel":
                     raise KeyboardInterrupt
+                # If the user types anything other than "preset" or "custom", inform them that their choice is invalid and ask again
                 elif not perm_type in ["preset", "custom"]:
                     print("Invalid choice. Please try again.")
                     continue
                 else:
                     break
 
+            # Define a dictionary mapping permission codes to their descriptions
+            perms_match = {
+                "e": "change directory",
+                "l": "list files",
+                "r": "retrieve file",
+                "a": "append data to file",
+                "d": "delete file",
+                "f": "rename file",
+                "m": "create directory",
+                "w": "store file",
+                "M": "change file mode",
+                "T": "change file modification time",
+            }
+
+            # Start another infinite loop
             while True:
+                # If the user chose "preset" permissions, present them with three options
                 if perm_type == "preset":
                     print("Preset permissions:")
                     print(f"1. Read only ({read_perms})")
                     print(f"2. Read Write ({read_write_perms})")
                     print(f"3. Admin ({admin_perms})")
                     perm_choice = input(">>> ").lower()
+                    # If the user types "1" or "read only", set the permissions to read_perms and break the loop
                     if perm_choice == "1" or perm_choice == "read only":
-                        return read_perms
+                        perm = read_perms
+                        break
+                    # If the user types "2" or "read write", set the permissions to read_write_perms and break the loop
                     elif perm_choice == "2" or perm_choice == "read write":
-                        return read_write_perms
+                        perm = read_write_perms
+                        break
+                    # If the user types "3" or "admin", set the permissions to admin_perms and break the loop
                     elif perm_choice == "3" or perm_choice == "admin":
-                        return admin_perms
+                        perm = admin_perms
+                        break
                     elif perm_choice == "cancel":
                         raise KeyboardInterrupt
                     else:
                         print("Invalid choice. Please either options 1, 2 or 3 only.")
                         continue
+                # If the user chose "custom" permissions, ask them to enter the permissions they want to use
                 elif perm_type == "custom":
                     print("READ THE DOCS: https://pyftpdlib.readthedocs.io/en/latest/api.html#control-connection")
+
+                    # Get the saved permission sets
+                    saved_sets = jmod.getvalue(
+                        key="permission_sets",
+                        json_dir=settings_file,
+                        dt=data_tables.SETTINGS_DT,
+                        default={}
+                    )
+                    # If there are no saved permission sets, inform the user
+                    if len(saved_sets) == 0:
+                        print(f"{colours['yellow']}No saved permission sets found.{colours['white']}")
+                    else:
+                        print("Saved permission sets:")
+                        # Print the saved permission sets
+                        for perm_set in saved_sets:
+                            # permset would be the key in this case. saved_sets[perm_set] would be the value
+                            name, desc, permission = saved_sets[perm_set]
+                            print(f"<{name}> : {desc} ({permission})")
+                        print()
+
+                    # Ask the user to enter the permissions they want to use
                     print("Enter the permissions you want to use. (e.g. elradfmw)")
+                    if len(saved_sets) != 0:
+                        print("or use an old perm set by typing its above listed name. eg, <project x people>")
                     perm = input(">>> ").lower()
+                    # If the user types "cancel", raise a KeyboardInterrupt
                     if perm == "cancel":
                         raise KeyboardInterrupt
-                    elif not re.match("^[elradfmw]{7}$", perm):
+                    # If the user types a string that doesn't match the regular expression "^[elradfmw]{1,7}$", inform them that their choice is invalid and ask again
+                    elif not re.match("^[elradfmw]{1,7}$", perm):
                         print("Invalid permissions. Please try again.")
                         continue
                     else:
-                        return perm
+                        # If the user's custom permissions are valid, print out the descriptions of the permissions they chose and ask them to confirm
+                        print(f"{colours['green']}This permissions set will be{colours['white']}")
+                        counter = 0
+                        for i in perm:
+                            grayed = "" if counter % 2 == 0 else "\033[90m"
+                            print(f"{grayed}{perms_match[i]}: {i}{colours['white']}")
+                            counter += 1
+                        print("Is this correct? (y/n)")
+                        command = input(">>> ").lower()
+                        # If the user confirms, break the loop
+                        if "y" in command:
+                            break
+                        else:
+                            print("Please try again.")
+                            continue
+
+            # If the askToSave flag is set to True
+            if askToSave:
+                # Start an infinite loop
+                while True:
+                    # Ask the user if they want to save the permission set
+                    print("Would you like to save this permission set? (y/n)")
+                    command = input(">>> ").lower()
+                    # If the user types "y" or "n", break the loop
+                    if 'y' in command or 'n' in command:
+                        break
+                    else:
+                        # If the user types anything else, inform them that their choice is invalid and ask again
+                        print("Invalid choice. Please try again.")
+                        continue
+
+                # If the user wants to save the permission set
+                if "y" in command:
+                    # Initialize a new permission set
+                    perm_set = data_tables.PERMISSION_SET
+                    perm_set["permissions"] = perm
+
+                    # Start an infinite loop
+                    while True:
+                        # Ask the user to enter a name for the permission set
+                        print("Enter a name for the permission set.")
+                        perm_set["name"] = input(">>> ")
+                        # If the user types "cancel", raise a KeyboardInterrupt
+                        if perm_set["name"] == "cancel":
+                            raise KeyboardInterrupt
+                        elif perm_set["name"] == "":
+                            print("Name cannot be empty.")
+                            continue
+                        else:
+                            break
+
+                    # Start another infinite loop
+                    while True:
+                        # Ask the user to enter a description for the permission set
+                        print("How would you describe this permission set? (e.g. 'read only' or 'for admins')")
+                        perm_set["description"] = input(">>> ")
+                        if perm_set["description"] == "cancel":
+                            raise KeyboardInterrupt
+                        # If the user doesn't enter a description, inform them that the description cannot be empty and ask again
+                        elif perm_set["description"] == "":
+                            print("Description cannot be empty.")
+                            continue
+                        else:
+                            break
+
+                    saved_perm_sets = jmod.getvalue(
+                        key="permission_sets",
+                        json_dir=settings_file,
+                        dt=data_tables.SETTINGS_DT,
+                        default={}
+                    )
+                    # Add the new permission set to the saved permission sets
+                    saved_perm_sets[perm_set["name"]] = perm_set
+                    # Save the updated permission sets
+                    jmod.setvalue(
+                        key="permission_sets",
+                        value=saved_perm_sets,
+                        json_dir=settings_file,
+                        dt=data_tables.SETTINGS_DT,
+                    )
+                    print(f"{colours['green']}Permission set saved successfully.{colours['white']}")
+
+            # Return the permissions the user chose
+            return perm
