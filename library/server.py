@@ -178,7 +178,7 @@ class ftps:
             default=6464,
             dt=data_tables.SETTINGS_DT
         )
-        server = ThreadedFTPServer(("localhost", server_port), handler)
+        server = ThreadedFTPServer(("0.0.0.0", server_port), handler)
         print(f"<--FILE TRANSFER PROTOCAL {'SECURED' if use_ssl else ''} RUNNING ON \"localhost:{server_port}\" WITH {len(user_list)} USERS-->", flush=True)
 
         try:
