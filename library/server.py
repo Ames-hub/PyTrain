@@ -226,3 +226,6 @@ class ftps:
         except KeyboardInterrupt:
             server.close_all()
             print("--FILE TRANSFER PROTOCAL HAS BEEN STOPPED--")
+        # Excepts for the port being in use
+        except OSError:
+            print(f"Port {server_port} is in use. Please change the port in the settings file.")

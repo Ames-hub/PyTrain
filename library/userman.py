@@ -276,7 +276,7 @@ class userman:
                 else:
                     return password
 
-        def homedir():
+        def homedir(only_existing_dirs=False):
             while True:
                 print("Hint: Use the '~' character to append the project directory to the specified folder.")
                 print("And enter 'local' for a homedir of the same name as the user.")
@@ -293,12 +293,14 @@ class userman:
                     print("Appendng the current working directory to the specified folder...")
                     homedir = os.path.join(os.getcwd(), homedir[1:])
 
-                if not os.path.exists(homedir):
-                    print("The specified directory does not exist. Please try again or enter an absolute (full) path.")
-                    continue
-
+                if only_existing_dirs:
+                    if not os.path.exists(homedir):
+                        print("The specified directory does not exist. Please try again or enter an absolute (full) path.")
+                        continue
                 else:
-                    return homedir
+                    os.makedirs(homedir, exist_ok=True)
+
+                return homedir
                 
         def perms(askToSave=True):
             # Start an infinite loop
