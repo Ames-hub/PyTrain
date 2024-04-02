@@ -178,6 +178,28 @@ class ftps:
             default=6464,
             dt=data_tables.SETTINGS_DT
         )
+
+        def test_serverport(port):
+            server = ThreadedFTPServer(("0.0.0.0", server_port), handler)
+            server.serve_forever(blocking=False)
+            server.close_all()
+
+        autofind_port = jmod.getvalue(key='autofind_port', json_dir=settings_file, default=True, dt=data_tables.SETTINGS_DT)
+
+        # Checks if the port is already in use
+        while True:
+            try:
+                test_serverport(server_port)
+                break # If the port is not in use, it wont except. so we break the loop
+            except:
+                if autofind_port:
+                    server_port += 1
+                    print(f"Port taken. Trying '{server_port}'")
+                    continue
+                else:
+                    break
+
+
         server = ThreadedFTPServer(("0.0.0.0", server_port), handler)
         print(f"<--FILE TRANSFER PROTOCAL {'SECURED' if use_ssl else ''} RUNNING ON \"localhost:{server_port}\" WITH {len(user_list)} USERS-->", flush=True)
 

@@ -3,3 +3,4 @@ library/ssl
 settings.json
 __pycache__
 ftp_dir
+.idea

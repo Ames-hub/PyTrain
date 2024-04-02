@@ -123,7 +123,7 @@ class userman:
             except KeyboardInterrupt:
                 print("Cancelling user editing.")
                 return
-        
+
         user_list = userman.list_users()
         user = user_list[username]
 
@@ -251,11 +251,13 @@ class userman:
                     continue
                 else:
                     if only_existing is True:
-                        if username in dict(jmod.getvalue(json_dir=settings_file, dt=data_tables.SETTINGS_DT, key="PyTrain_users", default={})).keys():
-                            return username
-                        else:
+                        try:
+                            userlist = userman.list_users()
+                            userlist[username]
+                        except KeyError:
                             print("The specified user does not exist.")
                             continue
+                        return username
                     else:
                         if username in dict(jmod.getvalue(json_dir=settings_file, dt=data_tables.SETTINGS_DT, key="PyTrain_users", default={})).keys():
                             print("The specified user already exists. Please try again.")

@@ -11,6 +11,7 @@ class data_tables:
         "AnonAllowed": False,
         "RootPassword": gen_random_password(),
         "port": 6464,
+        "autofind_port": True, # If port is in use, will find a new one
         "certfile": "library/ssl/certificate.pem",
         "keyfile": "library/ssl/private.key",
         "permission_sets": {},
