@@ -201,7 +201,7 @@ class ftps:
 
 
         server = ThreadedFTPServer(("0.0.0.0", server_port), handler)
-        print(f"<--FILE TRANSFER PROTOCAL {'SECURED' if use_ssl else ''} RUNNING ON \"localhost:{server_port}\" WITH {len(user_list)} USERS-->", flush=True)
+        print(f"<--FILE TRANSFER PROTOCAL {'SECURED' if use_ssl else ''} RUNNING ON \"0.0.0.0:{server_port}\" WITH {len(user_list)} USERS-->", flush=True)
 
         try:
             while True:
@@ -219,6 +219,7 @@ class ftps:
                     user: dict = user_list[user]
 
                     # Checks if the user is already in the authorizer
+                    os.makedirs(user['home_dir'], exist_ok=True)
                     if user['username'] not in authorizer.user_table:
                         # Adds the user to the authorizer
                         authorizer.add_user(
